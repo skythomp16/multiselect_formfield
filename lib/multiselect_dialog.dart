@@ -19,21 +19,22 @@ class MultiSelectDialog<V> extends StatefulWidget {
   final Color? checkBoxActiveColor;
   final bool? showSelectAll;
   final String? selectAllText;
-  bool selectAllState = false;
+  bool? selectAllState;
 
   MultiSelectDialog(
       {Key? key,
-      this.items,
-      this.initialSelectedValues,
-      this.title,
-      this.okButtonLabel,
-      this.cancelButtonLabel,
-      this.labelStyle = const TextStyle(),
-      this.dialogShapeBorder,
-      this.checkBoxActiveColor,
-      this.checkBoxCheckColor,
-      this.showSelectAll,
-      this.selectAllText})
+        this.items,
+        this.initialSelectedValues,
+        this.title,
+        this.okButtonLabel,
+        this.cancelButtonLabel,
+        this.labelStyle = const TextStyle(),
+        this.dialogShapeBorder,
+        this.checkBoxActiveColor,
+        this.checkBoxCheckColor,
+        this.showSelectAll,
+        this.selectAllText,
+        this.selectAllState})
       : super(key: key);
 
   @override

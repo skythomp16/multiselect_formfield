@@ -1,7 +1,7 @@
 library multiselect_formfield;
 
 import 'package:flutter/material.dart';
-import 'package:multiselect_formfield/multiselect_dialog.dart';
+import 'package:bible_reading_plan_generator/multiselect_dialog.dart';
 
 class MultiSelectFormField extends FormField<dynamic> {
   final Widget title;
@@ -16,6 +16,7 @@ class MultiSelectFormField extends FormField<dynamic> {
   final Function? close;
   final Widget? leading;
   final Widget? trailing;
+  final bool? showChips;
   final String okButtonLabel;
   final String cancelButtonLabel;
   final Color? fillColor;
@@ -52,6 +53,7 @@ class MultiSelectFormField extends FormField<dynamic> {
     this.fillColor,
     this.border,
     this.trailing,
+    this.showChips = true,
     this.chipLabelStyle,
     this.enabled = true,
     this.chipBackGroundColor,
@@ -65,124 +67,130 @@ class MultiSelectFormField extends FormField<dynamic> {
     this.selectAllText = "Select All",
     this.selectAllState = false,
   }) : super(
-          onSaved: onSaved,
-          validator: validator,
-          initialValue: initialValue,
-          autovalidateMode: autovalidate,
-          builder: (FormFieldState<dynamic> state) {
-            List<Widget> _buildSelectedOptions(state) {
-              List<Widget> selectedOptions = [];
+    onSaved: onSaved,
+    validator: validator,
+    initialValue: initialValue,
+    autovalidateMode: autovalidate,
+    builder: (FormFieldState<dynamic> state) {
+      List<Widget> _buildSelectedOptions(state) {
+        List<Widget> selectedOptions = [];
 
-              if (state.value != null) {
-                state.value.forEach((item) {
-                  var existingItem = dataSource!.singleWhere(((itm) => itm[valueField] == item),
-                      orElse: () => null);
-                  selectedOptions.add(Chip(
-                    labelStyle: chipLabelStyle,
-                    backgroundColor: chipBackGroundColor,
-                    label: Text(
-                      existingItem[textField],
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ));
-                });
-              }
+        if (state.value != null) {
+          if (state.value.length > 10) {
+            selectedOptions.add(Text("Multiple options selected"));
+          } else {
+            state.value.forEach((item) {
+              var existingItem = dataSource!.singleWhere(((itm) => itm[valueField] == item),
+                  orElse: () => null);
+              if (showChips == true) {
+                selectedOptions.add(Chip(
+                  labelStyle: chipLabelStyle,
+                  backgroundColor: chipBackGroundColor,
+                  label: Text(
+                    existingItem[textField],
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ));}
+            });}
 
-              return selectedOptions;
-            }
+        }
 
-            return InkWell(
+        return selectedOptions;
+      }
 
-              onTap:  !enabled ? null :() async {
-                List? initialSelected = state.value;
-                if (initialSelected == null) {
-                  initialSelected = [];
-                }
+      return InkWell(
 
-                final items = <MultiSelectDialogItem<dynamic>>[];
-                      dataSource!.forEach((item) {
-                  items.add(
-                      MultiSelectDialogItem(item[valueField], item[textField]));
-                });
+        onTap:  !enabled ? null :() async {
+          List? initialSelected = state.value;
+          if (initialSelected == null) {
+            initialSelected = [];
+          }
 
-                List? selectedValues = await showDialog<List>(
-                  context: state.context,
-                  builder: (BuildContext context) {
-                    return MultiSelectDialog(
-                      title: title,
-                      okButtonLabel: okButtonLabel,
-                      cancelButtonLabel: cancelButtonLabel,
-                      items: items,
-                      initialSelectedValues: initialSelected,
-                      showSelectAll: showSelectAll,
-                      selectAllText: selectAllText,
-                      labelStyle: dialogTextStyle,
-                      dialogShapeBorder: dialogShapeBorder,
-                      checkBoxActiveColor: checkBoxActiveColor,
-                      checkBoxCheckColor: checkBoxCheckColor,
-                    );
-                  },
-                );
+          final items = <MultiSelectDialogItem<dynamic>>[];
+          dataSource!.forEach((item) {
+            items.add(
+                MultiSelectDialogItem(item[valueField], item[textField]));
+          });
 
-                if (selectedValues != null) {
-                  state.didChange(selectedValues);
-                  state.save();
-                }
-              },
-              child: InputDecorator(
-                decoration: InputDecoration(
-                  filled: true,
-                  errorText: state.hasError ? state.errorText : null,
-                  errorMaxLines: 4,
-                  fillColor: fillColor ?? Theme.of(state.context).canvasColor,
-                  border: border ?? UnderlineInputBorder(),
-                ),
-                isEmpty: state.value == null || state.value == '',
-                child: Column(
+          List? selectedValues = await showDialog<List>(
+            context: state.context,
+            builder: (BuildContext context) {
+              return MultiSelectDialog(
+                title: title,
+                okButtonLabel: okButtonLabel,
+                cancelButtonLabel: cancelButtonLabel,
+                items: items,
+                initialSelectedValues: initialSelected,
+                showSelectAll: showSelectAll,
+                selectAllText: selectAllText,
+                labelStyle: dialogTextStyle,
+                dialogShapeBorder: dialogShapeBorder,
+                checkBoxActiveColor: checkBoxActiveColor,
+                checkBoxCheckColor: checkBoxCheckColor,
+                selectAllState: selectAllState,
+              );
+            },
+          );
+
+          if (selectedValues != null) {
+            state.didChange(selectedValues);
+            state.save();
+          }
+        },
+        child: InputDecorator(
+          decoration: InputDecoration(
+            filled: true,
+            errorText: state.hasError ? state.errorText : null,
+            errorMaxLines: 4,
+            fillColor: fillColor ?? Theme.of(state.context).canvasColor,
+            border: border ?? UnderlineInputBorder(),
+          ),
+          isEmpty: state.value == null || state.value == '',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child: title,
-                          ),
-                          required
-                              ? Padding(
-                                  padding: EdgeInsets.only(top: 5, right: 5),
-                                  child: Text(
-                                    ' *',
-                                    style: TextStyle(
-                                      color: Colors.red.shade700,
-                                      fontSize: 17.0,
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            color: Colors.black87,
-                            size: 25.0,
-                          ),
-                        ],
-                      ),
+                    Expanded(
+                      child: title,
                     ),
-                    state.value != null && state.value.length > 0
-                        ? Wrap(
-                            spacing: 8.0,
-                            runSpacing: 0.0,
-                            children: _buildSelectedOptions(state),
-                          )
-                        : new Container(
-                            padding: EdgeInsets.only(top: 4),
-                            child: hintWidget,
-                          )
+                    required
+                        ? Padding(
+                      padding: EdgeInsets.only(top: 5, right: 5),
+                      child: Text(
+                        ' *',
+                        style: TextStyle(
+                          color: Colors.red.shade700,
+                          fontSize: 17.0,
+                        ),
+                      ),
+                    )
+                        : Container(),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.black87,
+                      size: 25.0,
+                    ),
                   ],
                 ),
               ),
-            );
-          },
-        );
+              state.value != null && state.value.length > 0
+                  ? Wrap(
+                spacing: 8.0,
+                runSpacing: 0.0,
+                children: _buildSelectedOptions(state),
+              )
+                  : new Container(
+                padding: EdgeInsets.only(top: 4),
+                child: hintWidget,
+              )
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
