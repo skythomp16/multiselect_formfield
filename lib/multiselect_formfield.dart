@@ -27,6 +27,8 @@ class MultiSelectFormField extends FormField<dynamic> {
   final Color? checkBoxCheckColor;
   final Color? checkBoxActiveColor;
   final bool enabled;
+  final bool showSelectAll;
+  final String selectAllText;
 
   MultiSelectFormField({
     FormFieldSetter<dynamic>? onSaved,
@@ -58,6 +60,8 @@ class MultiSelectFormField extends FormField<dynamic> {
     ),
     this.checkBoxActiveColor,
     this.checkBoxCheckColor,
+    this.showSelectAll = true,
+    this.selectAllText = "Select All",
   }) : super(
           onSaved: onSaved,
           validator: validator,
@@ -108,6 +112,8 @@ class MultiSelectFormField extends FormField<dynamic> {
                       cancelButtonLabel: cancelButtonLabel,
                       items: items,
                       initialSelectedValues: initialSelected,
+                      showSelectAll: showSelectAll,
+                      selectAllText: selectAllText,
                       labelStyle: dialogTextStyle,
                       dialogShapeBorder: dialogShapeBorder,
                       checkBoxActiveColor: checkBoxActiveColor,
