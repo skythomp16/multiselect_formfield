@@ -29,6 +29,7 @@ class MultiSelectFormField extends FormField<dynamic> {
   final bool enabled;
   final bool showSelectAll;
   final String selectAllText;
+  bool selectAllState;
 
   MultiSelectFormField({
     FormFieldSetter<dynamic>? onSaved,
@@ -62,6 +63,7 @@ class MultiSelectFormField extends FormField<dynamic> {
     this.checkBoxCheckColor,
     this.showSelectAll = true,
     this.selectAllText = "Select All",
+    this.selectAllState = false,
   }) : super(
           onSaved: onSaved,
           validator: validator,
