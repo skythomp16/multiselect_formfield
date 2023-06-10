@@ -30,6 +30,7 @@ class MultiSelectFormField extends FormField<dynamic> {
   final bool enabled;
   final bool showSelectAll;
   final String selectAllText;
+  final int maxChips;
   bool selectAllState;
 
   MultiSelectFormField({
@@ -65,6 +66,7 @@ class MultiSelectFormField extends FormField<dynamic> {
     this.checkBoxCheckColor,
     this.showSelectAll = true,
     this.selectAllText = "Select All",
+    this.maxChips = 10,
     this.selectAllState = false,
   }) : super(
     onSaved: onSaved,
@@ -76,8 +78,13 @@ class MultiSelectFormField extends FormField<dynamic> {
         List<Widget> selectedOptions = [];
 
         if (state.value != null) {
-          if (state.value.length > 10) {
-            selectedOptions.add(Text("Multiple options selected"));
+          if (state.value.length > maxChips) {
+            if (dataSource != null && state.value.length == dataSource.length) {
+              selectedOptions.add(Text("All options selected"));
+            } else {
+              selectedOptions.add(
+                  Text(state.value.length.toString() + " options selected"));
+            }
           } else {
             state.value.forEach((item) {
               var existingItem = dataSource!.singleWhere(((itm) => itm[valueField] == item),
